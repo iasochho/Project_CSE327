@@ -10,7 +10,9 @@ Workout Tracker with Social Features
 
 **Group Members**
 
-Irfan Ahamad Sochho 2012637642
+Irfan Ahamad Sochho  2012637642
+Khandker Farhan Hossain  2231878042
+Farhan Ahmed Fahim  2232581642
 
 **Project Description**
 
