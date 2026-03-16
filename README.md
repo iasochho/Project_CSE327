@@ -6,7 +6,7 @@ Workout Tracker with Social Features
 
 **Group Name**
 
-.................
+Delta
 
 **Group Members**
 
