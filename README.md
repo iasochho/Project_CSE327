@@ -2,7 +2,7 @@
 
 **Project Title**
 
-Workout Tracker with Social Features
+AI-Powered Fitness Tracking and Workout Assistant
 
 **Group Name**
 
