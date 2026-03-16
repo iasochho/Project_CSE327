@@ -6,7 +6,7 @@ AI-Powered Fitness Tracking and Workout Assistant
 
 **Group Name**
 
-Delta
+ReadySet
 
 **Group Members**
 
