@@ -1,30 +1,35 @@
-// lib/screens/auth/login_screen.dart
+// lib/screens/auth/signup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../shell/main_shell.dart';
-import 'signup_screen.dart';
+import 'login_screen.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends ConsumerStatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _SignupScreenState extends ConsumerState<SignupScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  void _signIn() {
+  void _signUp() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const MainShell()),
     );
@@ -70,6 +75,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 64),
 
+              // ── Name ───────────────────────────────────────────────────────
+              _FieldLabel('FULL NAME'),
+              const SizedBox(height: 8),
+              _InputField(
+                controller: _nameController,
+                hint: 'John Doe',
+                keyboardType: TextInputType.name,
+              ),
+              const SizedBox(height: 20),
+
               // ── Email ──────────────────────────────────────────────────────
               _FieldLabel('EMAIL ADDRESS'),
               const SizedBox(height: 8),
@@ -81,22 +96,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const SizedBox(height: 20),
 
               // ── Password ───────────────────────────────────────────────────
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _FieldLabel('PASSWORD'),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text(
-                      'FORGOT?',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: AppColors.primary,
-                            letterSpacing: 1,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
+              _FieldLabel('PASSWORD'),
               const SizedBox(height: 8),
               _InputField(
                 controller: _passwordController,
@@ -114,14 +114,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
+              const SizedBox(height: 20),
+
+              // ── Confirm Password ───────────────────────────────────────────
+              _FieldLabel('CONFIRM PASSWORD'),
+              const SizedBox(height: 8),
+              _InputField(
+                controller: _confirmPasswordController,
+                hint: '',
+                obscure: _obscureConfirmPassword,
+                suffix: IconButton(
+                  icon: Icon(
+                    _obscureConfirmPassword
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    color: AppColors.textMuted,
+                    size: 20,
+                  ),
+                  onPressed: () =>
+                      setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                ),
+              ),
               const SizedBox(height: 36),
 
-              // ── Sign In Button ─────────────────────────────────────────────
+              // ── Sign Up Button ─────────────────────────────────────────────
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: _signIn,
+                  onPressed: _signUp,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -131,7 +152,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     elevation: 0,
                   ),
                   child: Text(
-                    'SIGN IN',
+                    'SIGN UP',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: Colors.white,
                           letterSpacing: 2,
@@ -174,20 +195,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 48),
 
-              // ── Create Account ─────────────────────────────────────────────
+              // ── Sign In ────────────────────────────────────────────────────
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Don't have an account?  ",
+                  Text("Already have an account?  ",
                       style: Theme.of(context).textTheme.bodyMedium),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (_) => const SignupScreen()),
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
                       );
                     },
                     child: Text(
-                      'Create Account',
+                      'Sign In',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w700,
