@@ -6,7 +6,7 @@ import '../models/app_models.dart';
 
 const _mockUser = UserModel(
   name: 'Alex Rivera',
-  email: 'alex.rivera@zenfitness.com',
+  email: 'alex.rivera@readyset.com',
   avatarUrl: '',
   totalWorkouts: 124,
   dayStreak: 14,

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/app_providers.dart';
 import '../home/home_screen.dart';
+import '../workouts/workouts_screen.dart';
 import '../progress/progress_screen.dart';
 import '../profile/profile_screen.dart';
 
@@ -12,7 +13,7 @@ class MainShell extends ConsumerWidget {
 
   static const _screens = [
     HomeScreen(),
-    _PlaceholderScreen(label: 'Workouts', icon: Icons.fitness_center),
+    WorkoutsScreen(),
     ProgressScreen(),
     _PlaceholderScreen(label: 'Chat', icon: Icons.chat_bubble_outline),
     ProfileScreen(),
