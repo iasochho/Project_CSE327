@@ -80,13 +80,6 @@ class AppTheme {
             color: AppColors.textMuted,
           ),
         ),
-        cardTheme: CardThemeData(
-          color: AppColors.surface,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
         appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.background,
           elevation: 0,

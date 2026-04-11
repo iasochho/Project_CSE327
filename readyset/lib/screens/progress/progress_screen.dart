@@ -182,8 +182,8 @@ class _StrengthChart extends StatelessWidget {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              AppColors.primary.withOpacity(0.15),
-                              AppColors.primary.withOpacity(0.0),
+                              AppColors.primary.withValues(alpha: 0.15),
+                              AppColors.primary.withValues(alpha: 0.0),
                             ],
                           ),
                         ),
@@ -407,7 +407,7 @@ class _MilestoneIcon extends StatelessWidget {
       width: 44,
       height: 44,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         shape: BoxShape.circle,
       ),
       child: Icon(icon, color: color, size: 22),
