@@ -102,7 +102,7 @@ class KZAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            'READY SET',
+            'KINETIC ZEN',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: AppColors.primary,
                   fontWeight: FontWeight.w800,

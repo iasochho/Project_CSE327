@@ -5,8 +5,6 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/app_providers.dart';
 import '../../widgets/common/shared_widgets.dart';
-import '../settings/settings_screen.dart';
-import '../auth/login_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -198,10 +196,7 @@ class ProfileScreen extends ConsumerWidget {
                 _SettingsTile(
                   icon: Icons.settings_outlined,
                   label: 'Account Settings',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (_) => const SettingsScreen()),
-                  ),
+                  onTap: () {},
                 ),
                 const SizedBox(height: 10),
                 _SettingsTile(
@@ -213,12 +208,7 @@ class ProfileScreen extends ConsumerWidget {
 
                 // ── Logout ────────────────────────────────────────────────────
                 GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (_) => false,
-                    );
-                  },
+                  onTap: () {},
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
