@@ -8,8 +8,6 @@ The main objective of this project is to provide a smart and interactive fitness
 
 ## App ScreenShots
 
-## 📱 App Screenshots
-
 <p align="center">
   <img src="https://github.com/user-attachments/assets/42eaa80f-daa2-480a-8128-c698c64a5156" width="180"/>
   <img src="https://github.com/user-attachments/assets/3862c537-a3f7-40b5-8f77-053fbaf72f25" width="180"/>
