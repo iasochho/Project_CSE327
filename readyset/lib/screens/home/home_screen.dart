@@ -1,6 +1,7 @@
 // lib/screens/home/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:readyset/screens/social%20features/notifications.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/app_providers.dart';
 import '../../widgets/common/shared_widgets.dart';
@@ -45,7 +46,11 @@ class HomeScreen extends ConsumerWidget {
             color: AppColors.primary,
             textColor: Colors.white,
             icon: Icons.play_circle_filled,
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => SocialScreen() ),
+              );
+            },
           ),
           const SizedBox(height: 12),
           _CTACard(

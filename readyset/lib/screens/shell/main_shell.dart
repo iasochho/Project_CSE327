@@ -7,6 +7,7 @@ import '../home/home_screen.dart';
 import '../workouts/workouts_screen.dart';
 import '../progress/progress_screen.dart';
 import '../profile/profile_screen.dart';
+import '../social features/social_feed.dart';
 
 class MainShell extends ConsumerWidget {
   const MainShell({super.key});
@@ -15,7 +16,7 @@ class MainShell extends ConsumerWidget {
     HomeScreen(),
     WorkoutsScreen(),
     ProgressScreen(),
-    _PlaceholderScreen(label: 'Chat', icon: Icons.chat_bubble_outline),
+    FeedScreen(),
     ProfileScreen(),
   ];
 
@@ -56,9 +57,9 @@ class _KZBottomNav extends StatelessWidget {
           activeIcon: Icons.show_chart,
           label: 'Progress'),
       _NavItem(
-          icon: Icons.chat_bubble_outline,
-          activeIcon: Icons.chat_bubble,
-          label: 'Chat'),
+          icon: Icons.people_outline,
+          activeIcon: Icons.people,
+          label: 'Social'),
       _NavItem(
           icon: Icons.person_outline,
           activeIcon: Icons.person,
