@@ -1,13 +1,12 @@
 // lib/screens/shell/main_shell.dart
-// OBSERVER PATTERN: navIndexProvider drives the active tab
-// All tab screens are wired to Firebase via their respective Riverpod providers
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/app_providers.dart';
+
+// Imports
 import '../home/home_screen.dart';
-import '../workouts/workouts_screen.dart';
+import '../workouts/workouts_screen.dart'; // This is now the Hub
 import '../progress/progress_screen.dart';
 import '../social_features/social_feed.dart';
 import '../profile/profile_screen.dart';
@@ -15,10 +14,11 @@ import '../profile/profile_screen.dart';
 class MainShell extends ConsumerWidget {
   const MainShell({super.key});
 
-  // IndexedStack keeps all screens alive for instant tab switching
+  // Maintaining the 5-tab structure. 
+  // Sub-navigation happens via Navigator.push, not by adding screens here.
   static const _screens = [
     HomeScreen(),
-    WorkoutsScreen(),
+    WorkoutsScreen(), // The central Hub
     ProgressScreen(),
     FeedScreen(),
     ProfileScreen(),
@@ -35,12 +35,13 @@ class MainShell extends ConsumerWidget {
       ),
       bottomNavigationBar: _KZBottomNav(
         currentIndex: currentIndex,
-        // Observer: writing to navIndexProvider triggers a rebuild
         onTap: (i) => ref.read(navIndexProvider.notifier).state = i,
       ),
     );
   }
 }
+
+// ... _KZBottomNav and _NavItem remains as provided in your snippet ...
 
 // ── Bottom Navigation Bar ─────────────────────────────────────────────────────
 class _KZBottomNav extends StatelessWidget {
