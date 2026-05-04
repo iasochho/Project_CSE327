@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "377879609974",
+    "project_id": "readiset",
+    "storage_bucket": "readiset.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:377879609974:android:d9784c1577f4a383a85557",
+        "android_client_info": {
+          "package_name": "com.example.readyset"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWUoICc_vIBk6j5xgAL-PsKf6_ERHN654"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,21 +1,27 @@
 // lib/screens/settings/settings_screen.dart
+// OBSERVER PATTERN: watches toggle state providers
+// STRATEGY PATTERN: signOut delegates to AuthService which uses the right AuthStrategy
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
+import '../../providers/app_providers.dart';
 import '../../widgets/common/shared_widgets.dart';
 import '../auth/login_screen.dart';
 
-// Simple local providers for toggle state
-final notificationsProvider = StateProvider<bool>((ref) => true);
-final darkModeProvider = StateProvider<bool>((ref) => false);
+// FIX: Removed duplicate local provider declarations for notificationsEnabledProvider,
+// darkModeEnabledProvider, and metricUnitsProvider — they are now defined in
+// app_providers.dart. Declaring them here caused "already defined" errors and made
+// authServiceProvider unreachable.
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifications = ref.watch(notificationsProvider);
-    final darkMode = ref.watch(darkModeProvider);
+    final notifications = ref.watch(notificationsEnabledProvider);
+    final darkMode      = ref.watch(darkModeEnabledProvider);
+    final metric        = ref.watch(metricUnitsProvider);
 
     return Scaffold(
       appBar: const KZAppBar(),
@@ -28,7 +34,7 @@ class SettingsScreen extends ConsumerWidget {
               style: Theme.of(context).textTheme.bodyMedium),
           const SizedBox(height: 28),
 
-          // ── Preferences ───────────────────────────────────────────────────
+          // ── Preferences ─────────────────────────────────────────────────────
           _SectionLabel('PREFERENCES'),
           const SizedBox(height: 10),
           _SettingsGroup(
@@ -40,7 +46,7 @@ class SettingsScreen extends ConsumerWidget {
                 label: 'Notifications',
                 value: notifications,
                 onChanged: (v) =>
-                    ref.read(notificationsProvider.notifier).state = v,
+                    ref.read(notificationsEnabledProvider.notifier).state = v,
               ),
               const _Divider(),
               _ToggleTile(
@@ -50,13 +56,23 @@ class SettingsScreen extends ConsumerWidget {
                 label: 'Dark Mode',
                 value: darkMode,
                 onChanged: (v) =>
-                    ref.read(darkModeProvider.notifier).state = v,
+                    ref.read(darkModeEnabledProvider.notifier).state = v,
+              ),
+              const _Divider(),
+              _ToggleTile(
+                icon: Icons.straighten_outlined,
+                iconBgColor: const Color(0xFFCCFBF1),
+                iconColor: AppColors.teal,
+                label: 'Metric Units (kg / km)',
+                value: metric,
+                onChanged: (v) =>
+                    ref.read(metricUnitsProvider.notifier).state = v,
               ),
             ],
           ),
           const SizedBox(height: 24),
 
-          // ── Account & Security ────────────────────────────────────────────
+          // ── Account & Security ───────────────────────────────────────────────
           _SectionLabel('ACCOUNT & SECURITY'),
           const SizedBox(height: 10),
           _SettingsGroup(
@@ -66,7 +82,22 @@ class SettingsScreen extends ConsumerWidget {
                 iconBgColor: const Color(0xFFEFF6FF),
                 iconColor: AppColors.primary,
                 label: 'Change Password',
-                onTap: () {},
+                onTap: () async {
+                  final user = ref.read(userProvider);
+                  if (user.email.isNotEmpty) {
+                    await ref
+                        .read(authServiceProvider)
+                        .sendPasswordReset(user.email);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Password reset email sent!'),
+                          backgroundColor: Color(0xFF005DA7),
+                        ),
+                      );
+                    }
+                  }
+                },
               ),
               const _Divider(),
               _NavTile(
@@ -76,17 +107,29 @@ class SettingsScreen extends ConsumerWidget {
                 label: 'Privacy Policy',
                 onTap: () {},
               ),
+              const _Divider(),
+              _NavTile(
+                icon: Icons.help_outline,
+                iconBgColor: const Color(0xFFF1F5F9),
+                iconColor: AppColors.textSecondary,
+                label: 'Help & Support',
+                onTap: () {},
+              ),
             ],
           ),
           const SizedBox(height: 28),
 
-          // ── Log Out ───────────────────────────────────────────────────────
+          // ── Log Out ──────────────────────────────────────────────────────────
+          // Strategy pattern: AuthService.signOut picks the correct sign-out strategy
           GestureDetector(
-            onTap: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                (_) => false,
-              );
+            onTap: () async {
+              await ref.read(authServiceProvider).signOut();
+              if (context.mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (_) => false,
+                );
+              }
             },
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 18),
@@ -102,10 +145,9 @@ class SettingsScreen extends ConsumerWidget {
                   Text(
                     'Log Out',
                     style: TextStyle(
-                      color: AppColors.error,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
+                        color: AppColors.error,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
@@ -119,7 +161,6 @@ class SettingsScreen extends ConsumerWidget {
 }
 
 // ── Sub-widgets ───────────────────────────────────────────────────────────────
-
 class _SectionLabel extends StatelessWidget {
   final String text;
   const _SectionLabel(this.text);
@@ -128,9 +169,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) => Text(
         text,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              letterSpacing: 1.2,
-              color: AppColors.textSecondary,
-            ),
+              letterSpacing: 1.2, color: AppColors.textSecondary),
       );
 }
 
@@ -145,8 +184,7 @@ class _SettingsGroup extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(
-              color: Color(0x08000000), blurRadius: 12, offset: Offset(0, 2))
+          BoxShadow(color: Color(0x08000000), blurRadius: 12, offset: Offset(0, 2))
         ],
       ),
       child: Column(children: children),
@@ -180,16 +218,13 @@ class _ToggleTile extends StatelessWidget {
           Container(
             width: 40,
             height: 40,
-            decoration: BoxDecoration(
-              color: iconBgColor,
-              shape: BoxShape.circle,
-            ),
+            decoration:
+                BoxDecoration(color: iconBgColor, shape: BoxShape.circle),
             child: Icon(icon, color: iconColor, size: 20),
           ),
           const SizedBox(width: 14),
           Expanded(
-              child:
-                  Text(label, style: Theme.of(context).textTheme.titleMedium)),
+              child: Text(label, style: Theme.of(context).textTheme.titleMedium)),
           Switch(
             value: value,
             onChanged: onChanged,
@@ -227,18 +262,15 @@ class _NavTile extends StatelessWidget {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                color: iconBgColor,
-                shape: BoxShape.circle,
-              ),
+              decoration:
+                  BoxDecoration(color: iconBgColor, shape: BoxShape.circle),
               child: Icon(icon, color: iconColor, size: 20),
             ),
             const SizedBox(width: 14),
             Expanded(
                 child: Text(label,
                     style: Theme.of(context).textTheme.titleMedium)),
-            const Icon(Icons.chevron_right,
-                color: AppColors.textMuted, size: 22),
+            const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 22),
           ],
         ),
       ),
@@ -251,9 +283,5 @@ class _Divider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Divider(
-        height: 1,
-        indent: 70,
-        endIndent: 16,
-        color: Color(0xFFF1F3F5),
-      );
+        height: 1, indent: 70, endIndent: 16, color: Color(0xFFF1F3F5));
 }

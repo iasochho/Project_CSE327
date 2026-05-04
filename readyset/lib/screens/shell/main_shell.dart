@@ -1,4 +1,7 @@
 // lib/screens/shell/main_shell.dart
+// OBSERVER PATTERN: navIndexProvider drives the active tab
+// All tab screens are wired to Firebase via their respective Riverpod providers
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
@@ -6,12 +9,13 @@ import '../../providers/app_providers.dart';
 import '../home/home_screen.dart';
 import '../workouts/workouts_screen.dart';
 import '../progress/progress_screen.dart';
+import '../social_features/social_feed.dart';
 import '../profile/profile_screen.dart';
-import '../social features/social_feed.dart';
 
 class MainShell extends ConsumerWidget {
   const MainShell({super.key});
 
+  // IndexedStack keeps all screens alive for instant tab switching
   static const _screens = [
     HomeScreen(),
     WorkoutsScreen(),
@@ -31,13 +35,14 @@ class MainShell extends ConsumerWidget {
       ),
       bottomNavigationBar: _KZBottomNav(
         currentIndex: currentIndex,
+        // Observer: writing to navIndexProvider triggers a rebuild
         onTap: (i) => ref.read(navIndexProvider.notifier).state = i,
       ),
     );
   }
 }
 
-// ── Bottom Nav Bar ────────────────────────────────────────────────────────────
+// ── Bottom Navigation Bar ─────────────────────────────────────────────────────
 class _KZBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -47,23 +52,11 @@ class _KZBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const items = [
-      _NavItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home'),
-      _NavItem(
-          icon: Icons.fitness_center_outlined,
-          activeIcon: Icons.fitness_center,
-          label: 'Workouts'),
-      _NavItem(
-          icon: Icons.show_chart_outlined,
-          activeIcon: Icons.show_chart,
-          label: 'Progress'),
-      _NavItem(
-          icon: Icons.people_outline,
-          activeIcon: Icons.people,
-          label: 'Social'),
-      _NavItem(
-          icon: Icons.person_outline,
-          activeIcon: Icons.person,
-          label: 'Profile'),
+      _NavItem(icon: Icons.home_outlined,          activeIcon: Icons.home,          label: 'Home'),
+      _NavItem(icon: Icons.fitness_center_outlined, activeIcon: Icons.fitness_center,label: 'Workouts'),
+      _NavItem(icon: Icons.show_chart_outlined,     activeIcon: Icons.show_chart,    label: 'Progress'),
+      _NavItem(icon: Icons.people_outline,          activeIcon: Icons.people,         label: 'Social'),
+      _NavItem(icon: Icons.person_outline,          activeIcon: Icons.person,         label: 'Profile'),
     ];
 
     return Container(
@@ -77,8 +70,8 @@ class _KZBottomNav extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: items.asMap().entries.map((e) {
-              final i = e.key;
-              final item = e.value;
+              final i      = e.key;
+              final item   = e.value;
               final active = i == currentIndex;
 
               return GestureDetector(
@@ -103,8 +96,7 @@ class _KZBottomNav extends StatelessWidget {
                       const SizedBox(height: 6),
                       Icon(
                         active ? item.activeIcon : item.icon,
-                        color:
-                            active ? AppColors.primary : AppColors.textMuted,
+                        color: active ? AppColors.primary : AppColors.textMuted,
                         size: 22,
                       ),
                       const SizedBox(height: 4),
@@ -114,9 +106,7 @@ class _KZBottomNav extends StatelessWidget {
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.4,
-                          color: active
-                              ? AppColors.primary
-                              : AppColors.textMuted,
+                          color: active ? AppColors.primary : AppColors.textMuted,
                         ),
                       ),
                     ],
@@ -141,34 +131,4 @@ class _NavItem {
     required this.activeIcon,
     required this.label,
   });
-}
-
-// ── Placeholder for unimplemented screens ─────────────────────────────────────
-class _PlaceholderScreen extends StatelessWidget {
-  final String label;
-  final IconData icon;
-
-  const _PlaceholderScreen({required this.label, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 56, color: AppColors.textMuted),
-            const SizedBox(height: 16),
-            Text(label,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                    )),
-            const SizedBox(height: 8),
-            Text('Coming soon',
-                style: Theme.of(context).textTheme.bodyMedium),
-          ],
-        ),
-      ),
-    );
-  }
 }
