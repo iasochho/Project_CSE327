@@ -21,7 +21,7 @@ class Exercise {
   });
 }
 
-// ── Factory Pattern ───────────────────────────────────────────────────────────
+// ── Factory Pattern 
 // Creates exercises without exposing the raw data list to callers
 class ExerciseFactory {
   ExerciseFactory._();

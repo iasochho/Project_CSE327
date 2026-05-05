@@ -2,6 +2,9 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/common/shared_widgets.dart';
+import '../exercise/active_workout_screen.dart';
+import '../exercise/template_builder_screen.dart';
+import '../exercise/exercise_selection_screen.dart';
 
 // ── HUB SCREEN (Main Entry) ──────────────────────────────────────────────────
 class WorkoutsScreen extends StatelessWidget {
@@ -184,121 +187,3 @@ class _RecentWorkoutsList extends StatelessWidget {
     );
   }
 }
-
-// ── EXERCISE SELECTION SCREEN (The Library) ───────────────────────────────────
-class ExerciseSelectionScreen extends StatefulWidget {
-  const ExerciseSelectionScreen({super.key});
-
-  @override
-  State<ExerciseSelectionScreen> createState() => _ExerciseSelectionScreenState();
-}
-
-class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
-  String _selectedFilter = 'ALL';
-  String _searchQuery = '';
-
-  final List<Exercise> _exercises = const [
-    Exercise(name: 'Barbell Bench Press', muscleGroup: 'CHEST', type: 'COMPOUND', category: ExerciseCategory.strength),
-    Exercise(name: 'Back Squat', muscleGroup: 'LEGS', type: 'COMPOUND', category: ExerciseCategory.strength),
-    Exercise(name: 'Conventional Deadlift', muscleGroup: 'BACK', type: 'COMPOUND', category: ExerciseCategory.power),
-    Exercise(name: 'Pull Ups', muscleGroup: 'BACK', type: 'COMPOUND', category: ExerciseCategory.bodyweight),
-    Exercise(name: 'Dumbbell Curls', muscleGroup: 'ARMS', type: 'ISOLATION', category: ExerciseCategory.isolation),
-    Exercise(name: 'Hanging Leg Raise', muscleGroup: 'CORE', type: 'STABILITY', category: ExerciseCategory.core),
-  ];
-
-  final _filterLabels = ['ALL', 'CHEST', 'LEGS', 'BACK', 'ARMS', 'CORE'];
-
-  List<Exercise> get _filtered => _exercises.where((e) {
-        final matchesFilter = _selectedFilter == 'ALL' || e.muscleGroup == _selectedFilter;
-        final matchesSearch = _searchQuery.isEmpty || e.name.toLowerCase().contains(_searchQuery.toLowerCase());
-        return matchesFilter && matchesSearch;
-      }).toList();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Exercise Library")),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: TextField(
-              onChanged: (v) => setState(() => _searchQuery = v),
-              decoration: InputDecoration(
-                hintText: 'Search movements...',
-                prefixIcon: const Icon(Icons.search, size: 20),
-                filled: true,
-                fillColor: AppColors.surfaceVariant,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 36,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: _filterLabels.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (_, i) {
-                final label = _filterLabels[i];
-                final active = _selectedFilter == label;
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedFilter = label),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: active ? AppColors.primary : AppColors.surfaceVariant,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: active ? Colors.white : AppColors.textSecondary)),
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: _filtered.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (_, i) => _ExerciseCard(exercise: _filtered[i]),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── MODELS & SUB-COMPONENTS ──────────────────────────────────────────────────
-enum ExerciseCategory { strength, power, bodyweight, isolation, core }
-
-class Exercise {
-  final String name;
-  final String muscleGroup;
-  final String type;
-  final ExerciseCategory category;
-  const Exercise({required this.name, required this.muscleGroup, required this.type, required this.category});
-}
-
-class _ExerciseCard extends StatelessWidget {
-  final Exercise exercise;
-  const _ExerciseCard({required this.exercise});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      tileColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      title: Text(exercise.name),
-      subtitle: Text("${exercise.muscleGroup} • ${exercise.type}"),
-      trailing: const Icon(Icons.add_circle_outline, color: AppColors.primary),
-    );
-  }
-}
-
-// Empty Destinations
-class ActiveWorkoutScreen extends StatelessWidget { const ActiveWorkoutScreen({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Active Session"))); }
-class TemplateBuilderScreen extends StatelessWidget { const TemplateBuilderScreen({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Create Template"))); }
