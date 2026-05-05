@@ -1,7 +1,7 @@
-// lib/screens/exercise/exercise_selection_screen.dart
-// FACTORY PATTERN:  ExerciseFactory.search() builds filtered result list
-// OBSERVER PATTERN: filteredExercisesProvider re-fires on filter/search state change
-// BUG FIX:         'app_bar:' corrected to 'appBar:' (was causing a compile error)
+
+
+
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,7 +14,7 @@ import '../../providers/exercise_provider.dart';
 import '../exercise/active_workout_screen.dart';
 
 class ExerciseSelectionScreen extends ConsumerStatefulWidget {
-  /// When provided, a selected exercise is added to this existing session
+  
   final WorkoutSession? currentSession;
 
   const ExerciseSelectionScreen({super.key, this.currentSession});
@@ -27,18 +27,18 @@ class ExerciseSelectionScreen extends ConsumerStatefulWidget {
 class _ExerciseSelectionScreenState
     extends ConsumerState<ExerciseSelectionScreen> {
 
-  // Tracks locally chosen exercises for multi-select before committing
+  
   final Set<String> _selectedIds = {};
 
   @override
   Widget build(BuildContext context) {
-    // Observer: rebuilds whenever filter or search changes via Factory
+    
     final exercises = ref.watch(filteredExercisesProvider);
     final selected  = ref.watch(exerciseMuscleFilterProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
-      appBar: _buildAppBar(),   // FIX: was 'app_bar:' — now correctly 'appBar:'
+      appBar: _buildAppBar(),   
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -54,7 +54,7 @@ class _ExerciseSelectionScreenState
     );
   }
 
-  // ── App bar ────────────────────────────────────────────────────────────────
+  
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       backgroundColor: Colors.white.withOpacity(0.9),
@@ -83,7 +83,7 @@ class _ExerciseSelectionScreenState
     );
   }
 
-  // ── Search ─────────────────────────────────────────────────────────────────
+  
   Widget _buildSearchBar() {
     return Container(
       color: Colors.white,
@@ -108,7 +108,7 @@ class _ExerciseSelectionScreenState
     );
   }
 
-  // ── Muscle-group filter chips ──────────────────────────────────────────────
+  
   Widget _buildFilterChips(String selected) {
     return SizedBox(
       height: 40,
@@ -121,7 +121,7 @@ class _ExerciseSelectionScreenState
           final label  = exerciseMuscleFilters[i];
           final active = selected == label;
           return GestureDetector(
-            // Observer: write → Factory re-filters via filteredExercisesProvider
+            
             onTap: () =>
                 ref.read(exerciseMuscleFilterProvider.notifier).state = label,
             child: AnimatedContainer(
@@ -147,7 +147,7 @@ class _ExerciseSelectionScreenState
     );
   }
 
-  // ── Exercise list ──────────────────────────────────────────────────────────
+  
   Widget _buildList(List<Exercise> exercises) {
     if (exercises.isEmpty) {
       return const Center(
@@ -178,7 +178,7 @@ class _ExerciseSelectionScreenState
     );
   }
 
-  // ── Bottom action bar (shown when ≥1 exercise is selected) ────────────────
+  
   Widget _buildActionBar(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
@@ -187,7 +187,7 @@ class _ExerciseSelectionScreenState
         width: double.infinity,
         height: 52,
         child: ElevatedButton.icon(
-          // Builder pattern: build a new session with the selected exercises
+          
           onPressed: () => _startWithSelected(context),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF005DA7),
@@ -207,12 +207,12 @@ class _ExerciseSelectionScreenState
     );
   }
 
-  // Builder pattern: construct a WorkoutSession from the selected exercises
+  
   void _startWithSelected(BuildContext context) {
     final user = ref.read(userProvider);
     if (user.uid.isEmpty) return;
 
-    // Use ExerciseFactory to get full exercise objects
+    
     final allExercises = ExerciseFactory.byMuscleGroup('ALL');
     final chosen = allExercises.where((e) => _selectedIds.contains(e.id));
 
@@ -240,7 +240,7 @@ class _ExerciseSelectionScreenState
   }
 }
 
-// ── Exercise Row ──────────────────────────────────────────────────────────────
+
 class _ExerciseRow extends StatelessWidget {
   final Exercise exercise;
   final bool isSelected;

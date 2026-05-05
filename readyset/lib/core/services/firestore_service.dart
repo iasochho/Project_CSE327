@@ -1,13 +1,12 @@
-// lib/core/services/firestore_service.dart
-// ADAPTER PATTERN: FirestoreAdapter wraps raw Firestore docs into typed app models
-// BUILDER PATTERN: WorkoutBuilder constructs complex workout objects step by step
+
+
+
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/app_models.dart';
-import '../../models/exercise.dart';
 
-// ── Builder Pattern ───────────────────────────────────────────────────────────
+
 class WorkoutBuilder {
   String? _id;
   String? _title;
@@ -49,8 +48,8 @@ class WorkoutBuilder {
   }
 }
 
-// ── Adapter Pattern ───────────────────────────────────────────────────────────
-// Adapts raw Firestore DocumentSnapshot → typed app models
+
+
 class FirestoreAdapter {
   static UserProfile userFromDoc(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -128,7 +127,7 @@ class FirestoreAdapter {
   };
 
   static ProgressData progressFromDocs(List<QueryDocumentSnapshot> docs) {
-    // Aggregate workout docs into a ProgressData model
+    
     final completedDocs = docs.where((d) {
       final data = d.data() as Map<String, dynamic>;
       return data['isCompleted'] == true;
@@ -188,14 +187,14 @@ class FirestoreAdapter {
   };
 }
 
-// ── Firestore Service ─────────────────────────────────────────────────────────
+
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   String? get _uid => _auth.currentUser?.uid;
 
-  // ── User profile ───────────────────────────────────────────────────────────
+  
   Future<void> createUserProfile(UserProfile profile) async {
     await _db.collection('users').doc(profile.uid).set(
       FirestoreAdapter.userToDoc(profile),
@@ -216,7 +215,7 @@ class FirestoreService {
     );
   }
 
-  // ── Workouts ───────────────────────────────────────────────────────────────
+  
   Future<String> saveWorkout(WorkoutSession session) async {
     final doc = await _db.collection('workouts').add(
       FirestoreAdapter.workoutToDoc(session),
@@ -240,7 +239,7 @@ class FirestoreService {
       'durationMinutes': durationMinutes,
       'completedAt': FieldValue.serverTimestamp(),
     });
-    // Also increment totalWorkouts on user profile
+    
     if (_uid != null) {
       await _db.collection('users').doc(_uid).update({
         'totalWorkouts': FieldValue.increment(1),
@@ -252,7 +251,7 @@ class FirestoreService {
     await _db.collection('workouts').doc(workoutId).delete();
   }
 
-  // ── Progress ───────────────────────────────────────────────────────────────
+  
   Stream<ProgressData> watchProgress() {
     if (_uid == null) return Stream.value(_defaultProgress());
     return _db
@@ -273,7 +272,7 @@ class FirestoreService {
     recentMilestones: [],
   );
 
-  // ── Social ─────────────────────────────────────────────────────────────────
+  
   Stream<List<SocialPost>> watchSocialFeed() {
     return _db
         .collection('social_posts')
@@ -305,4 +304,58 @@ class FirestoreService {
     });
     await batch.commit();
   }
+
+  
+  Future<void> saveTemplate(WorkoutTemplate template) async {
+    if (_uid == null) return;
+    await _db.collection('users').doc(_uid).collection('templates').doc(template.id).set(
+      _templateToDoc(template),
+    );
+  }
+
+  Stream<List<WorkoutTemplate>> watchTemplates() {
+    if (_uid == null) return Stream.value([]);
+    return _db
+        .collection('users')
+        .doc(_uid)
+        .collection('templates')
+        .snapshots()
+        .map((snap) => snap.docs.map(_templateFromDoc).toList());
+  }
+
+  Future<void> deleteTemplate(String templateId) async {
+    if (_uid == null) return;
+    await _db.collection('users').doc(_uid).collection('templates').doc(templateId).delete();
+  }
+
+  WorkoutTemplate _templateFromDoc(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    final exercisesList = (data['exercises'] as List<dynamic>? ?? [])
+        .map((e) => FirestoreAdapter._exerciseEntryFromMap(e as Map<String, dynamic>))
+        .toList();
+    return WorkoutTemplate(
+      id: doc.id,
+      userId: data['userId'] ?? '',
+      name: data['name'] ?? '',
+      description: data['description'] ?? '',
+      exercises: exercisesList,
+      estimatedDurationMinutes: data['estimatedDurationMinutes'] ?? 0,
+      targetFocus: data['targetFocus'] ?? 'All',
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
+      isDraft: data['isDraft'] ?? true,
+    );
+  }
+
+  Map<String, dynamic> _templateToDoc(WorkoutTemplate template) => {
+    'userId': template.userId,
+    'name': template.name,
+    'description': template.description,
+    'exercises': template.exercises.map(FirestoreAdapter._exerciseEntryToMap).toList(),
+    'estimatedDurationMinutes': template.estimatedDurationMinutes,
+    'targetFocus': template.targetFocus,
+    'createdAt': Timestamp.fromDate(template.createdAt),
+    'updatedAt': Timestamp.fromDate(template.updatedAt ?? DateTime.now()),
+    'isDraft': template.isDraft,
+  };
 }

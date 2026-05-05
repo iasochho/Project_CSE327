@@ -1,19 +1,19 @@
-// lib/widgets/common/shared_widgets.dart
-// DECORATOR PATTERN:
-//   KZAppBar        – wraps notification icon with a live badge (BadgeDecorator)
-//   LoadingDecorator – overlays a spinner on any child
-//   ErrorDecorator  – prepends an error banner to any child
-//   BadgeDecorator  – adds a count bubble to any child widget
+
+
+
+
+
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/notification_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/app_providers.dart';
-// FIX: was '../screens/social features/notifications.dart' (one level too shallow)
+
 import '../../screens/social_features/notifications.dart';
 
-// ── KZ Card ───────────────────────────────────────────────────────────────────
+
 class KZCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -48,7 +48,7 @@ class KZCard extends StatelessWidget {
   }
 }
 
-// ── Stat Tile ─────────────────────────────────────────────────────────────────
+
 class StatTile extends StatelessWidget {
   final String label;
   final String value;
@@ -78,8 +78,8 @@ class StatTile extends StatelessWidget {
   }
 }
 
-// ── App Bar (Decorator: BadgeDecorator wraps notification icon) ───────────────
-// ConsumerWidget so it reactively reads notificationCountProvider
+
+
 class KZAppBar extends ConsumerWidget implements PreferredSizeWidget {
   final String? subtitle;
 
@@ -90,7 +90,7 @@ class KZAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Observer: badge count updates whenever a new notification arrives
+    
     final notifCount = ref.watch(notificationCountProvider);
 
     return AppBar(
@@ -120,14 +120,14 @@ class KZAppBar extends ConsumerWidget implements PreferredSizeWidget {
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 8),
-          // Decorator: BadgeDecorator adds count bubble to the bell icon
+          
           child: BadgeDecorator(
             count: notifCount,
             child: IconButton(
               icon: const Icon(Icons.notifications_outlined,
                   color: AppColors.textSecondary),
               onPressed: () {
-                // Reset badge then open notifications
+                
                 ref.read(notificationCountProvider.notifier).state = 0;
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const NotificationsScreen()),
@@ -141,14 +141,12 @@ class KZAppBar extends ConsumerWidget implements PreferredSizeWidget {
   }
 }
 
-// ── Decorator Pattern ─────────────────────────────────────────────────────────
-// Base decorator interface
+
 abstract class WidgetDecorator extends StatelessWidget {
   final Widget child;
   const WidgetDecorator({super.key, required this.child});
 }
 
-// Loading overlay – absorbs taps while spinning
 class LoadingDecorator extends WidgetDecorator {
   final bool isLoading;
   const LoadingDecorator({
@@ -176,7 +174,6 @@ class LoadingDecorator extends WidgetDecorator {
   }
 }
 
-// Error banner – prepends a dismissible red banner above child
 class ErrorDecorator extends WidgetDecorator {
   final String? error;
   final VoidCallback? onDismiss;
@@ -229,7 +226,6 @@ class ErrorDecorator extends WidgetDecorator {
   }
 }
 
-// Badge count bubble – wraps any widget with a red count indicator
 class BadgeDecorator extends WidgetDecorator {
   final int count;
   const BadgeDecorator({super.key, required super.child, required this.count});

@@ -1,4 +1,4 @@
-// lib/providers/app_providers.dart
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../core/services/auth_service.dart';
@@ -6,25 +6,25 @@ import '../core/services/firestore_service.dart';
 import '../core/services/notification_service.dart';
 import '../models/app_models.dart';
 
-// ── Auth & Firestore service providers ───────────────────────────────────────
+
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 final firestoreServiceProvider = Provider<FirestoreService>((ref) => FirestoreService());
 
-// ── WorkoutEventBus (Observer pattern) ───────────────────────────────────────
+
 final workoutEventBusProvider = Provider<WorkoutEventBus>((ref) => WorkoutEventBus.instance);
 
-// ── Notification badge count ──────────────────────────────────────────────────
+
 final notificationCountProvider = StateProvider<int>((ref) => 0);
 
-// ── Preference toggles ────────────────────────────────────────────────────────
+
 final notificationsEnabledProvider = StateProvider<bool>((ref) => true);
 final darkModeEnabledProvider      = StateProvider<bool>((ref) => false);
 final metricUnitsProvider          = StateProvider<bool>((ref) => true);
 
-// ── Bottom nav ────────────────────────────────────────────────────────────────
+
 final navIndexProvider = StateProvider<int>((ref) => 0);
 
-// ── Mock data ─────────────────────────────────────────────────────────────────
+
 const _mockUserProfile = UserProfile(
   uid: 'mock_uid_001',
   name: 'Alex Rivera',
@@ -92,40 +92,114 @@ final _mockProgress = ProgressModel(
   ],
 );
 
-// ── Riverpod providers ────────────────────────────────────────────────────────
 
-// UserProfile (used by active_workout_screen, exercise_selection_screen, etc.)
+
+
 final userProvider = Provider<UserProfile>((ref) => _mockUserProfile);
 
-// Legacy UserModel provider (kept for any screen that still reads UserModel)
+
 final userModelProvider = Provider<UserModel>((ref) => _mockUser);
 
 final statsProvider = Provider<StatsModel>((ref) => _mockStats);
 
-// progressProvider: StreamProvider so .when() works in progress_screen.dart
-// Falls back to mock data when not authenticated / Firestore unavailable.
+
+
 final progressProvider = StreamProvider<ProgressData>((ref) {
-  try {
-    return ref.read(firestoreServiceProvider).watchProgress();
-  } catch (_) {
-    return Stream.value(ProgressData(
-      strengthData: _mockProgress.strengthData,
-      strengthGainPercent: _mockProgress.strengthGainPercent,
-      avgSessionsPerWeek: _mockProgress.avgSessionsPerWeek,
-      prsHit: _mockProgress.prsHit,
-      totalVolumeTons: _mockProgress.totalVolumeTons.toInt(),
-      streakDays: _mockProgress.streakDays,
-      weightKg: _mockProgress.weightKg,
-      recentMilestones: _mockProgress.recentMilestones,
-    ));
-  }
+  return ref.read(firestoreServiceProvider).watchProgress().handleError(
+    (error, stack) {
+      
+      return ProgressData(
+        strengthData: _mockProgress.strengthData,
+        strengthGainPercent: _mockProgress.strengthGainPercent,
+        avgSessionsPerWeek: _mockProgress.avgSessionsPerWeek,
+        prsHit: _mockProgress.prsHit,
+        totalVolumeTons: _mockProgress.totalVolumeTons.toInt(),
+        streakDays: _mockProgress.streakDays,
+        weightKg: _mockProgress.weightKg,
+        recentMilestones: _mockProgress.recentMilestones,
+      );
+    },
+  );
 });
 
-// socialFeedProvider: StreamProvider so .when() works in social_feed.dart
+
 final socialFeedProvider = StreamProvider<List<SocialPost>>((ref) {
   try {
     return ref.read(firestoreServiceProvider).watchSocialFeed();
   } catch (_) {
     return Stream.value([]);
   }
+});
+
+
+final templatesProvider = StreamProvider<List<WorkoutTemplate>>((ref) {
+  return ref.read(firestoreServiceProvider).watchTemplates();
+});
+
+
+class TemplateBuilderNotifier extends StateNotifier<WorkoutTemplate> {
+  final FirestoreService _firestoreService;
+
+  TemplateBuilderNotifier(this._firestoreService)
+    : super(WorkoutTemplate(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: '',
+        name: '',
+        exercises: [],
+        createdAt: DateTime.now(),
+      ));
+
+  void setName(String name) {
+    state = state.copyWith(name: name);
+  }
+
+  void setDescription(String description) {
+    state = state.copyWith(description: description);
+  }
+
+  void setTargetFocus(String focus) {
+    state = state.copyWith(targetFocus: focus);
+  }
+
+  void setEstimatedDuration(int minutes) {
+    state = state.copyWith(estimatedDurationMinutes: minutes);
+  }
+
+  void addExercise(WorkoutExercise exercise) {
+    final updated = List<WorkoutExercise>.from(state.exercises)..add(exercise);
+    state = state.copyWith(exercises: updated);
+  }
+
+  void removeExercise(int index) {
+    final updated = List<WorkoutExercise>.from(state.exercises)..removeAt(index);
+    state = state.copyWith(exercises: updated);
+  }
+
+  void updateExercise(int index, WorkoutExercise exercise) {
+    final updated = List<WorkoutExercise>.from(state.exercises);
+    updated[index] = exercise;
+    state = state.copyWith(exercises: updated);
+  }
+
+  Future<void> saveTemplate(String userId) async {
+    final template = state.copyWith(
+      userId: userId,
+      isDraft: false,
+      updatedAt: DateTime.now(),
+    );
+    await _firestoreService.saveTemplate(template);
+  }
+
+  Future<void> saveDraft(String userId) async {
+    final template = state.copyWith(
+      userId: userId,
+      isDraft: true,
+      updatedAt: DateTime.now(),
+    );
+    await _firestoreService.saveTemplate(template);
+  }
+}
+
+final templateBuilderProvider = StateNotifierProvider<TemplateBuilderNotifier, WorkoutTemplate>((ref) {
+  return TemplateBuilderNotifier(ref.read(firestoreServiceProvider));
 });

@@ -1,7 +1,7 @@
-// lib/screens/home/home_screen.dart
-// OBSERVER PATTERN: watches statsProvider (derived from Firestore workouts stream)
-// BUILDER PATTERN:  Quick-start card builds a WorkoutSession via WorkoutBuilder
-// DECORATOR PATTERN: KZAppBar shows live notification badge
+
+
+
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,11 +22,11 @@ class HomeScreen extends ConsumerWidget {
     final now   = DateTime.now();
 
     return Scaffold(
-      appBar: KZAppBar(), // ConsumerWidget – badge updates automatically
+      appBar: KZAppBar(), 
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         children: [
-          // ── Greeting ────────────────────────────────────────────────────────
+          
           Text(_greeting(now.hour),
               style: Theme.of(context).textTheme.displayMedium),
           Text(
@@ -43,8 +43,8 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // ── CTA Cards ──────────────────────────────────────────────────────
-          // Builder pattern: tapping "Start Workout" builds a quick session
+          
+          
           _CTACard(
             label: 'LIVE SESSION',
             title: 'Start Workout',
@@ -75,11 +75,11 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // ── Streak ──────────────────────────────────────────────────────────
+          
           _StreakCard(days: stats.currentStreak),
           const SizedBox(height: 16),
 
-          // ── Stats Row ───────────────────────────────────────────────────────
+          
           Row(
             children: [
               Expanded(
@@ -103,7 +103,7 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
-          // ── Today's Focus Card ───────────────────────────────────────────────
+          
           _TodayFocusCard(
             title: stats.todayFocusTitle,
             duration: stats.todayFocusDuration,
@@ -117,7 +117,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  // Builder Pattern: constructs a WorkoutSession and launches ActiveWorkoutScreen
+  
   void _startQuickWorkout(BuildContext context, WidgetRef ref) {
     final user = ref.read(userProvider);
     if (user.uid.isEmpty) return;
@@ -179,7 +179,7 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-// ── CTA Card ──────────────────────────────────────────────────────────────────
+
 class _CTACard extends StatelessWidget {
   final String label;
   final String title;
@@ -249,7 +249,7 @@ class _CTACard extends StatelessWidget {
   }
 }
 
-// ── Streak Card ───────────────────────────────────────────────────────────────
+
 class _StreakCard extends StatelessWidget {
   final int days;
   const _StreakCard({required this.days});
@@ -305,7 +305,7 @@ class _StreakCard extends StatelessWidget {
   }
 }
 
-// ── Today's Focus Card ────────────────────────────────────────────────────────
+
 class _TodayFocusCard extends StatelessWidget {
   final String title;
   final String duration;

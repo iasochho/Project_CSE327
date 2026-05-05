@@ -1,5 +1,5 @@
-// lib/screens/exercise/active_workout_screen.dart
-// Uses: Builder (WorkoutBuilder), Observer (WorkoutEventBus), Decorator (LoadingDecorator)
+
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,10 +27,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   void initState() {
     super.initState();
 
-    // Observer registration
+    
     ref.read(workoutEventBusProvider).subscribe(this);
 
-    // Builder pattern: build a WorkoutSession if none provided
+    
     if (widget.prebuiltSession != null) {
       _session = widget.prebuiltSession!;
     } else {
@@ -75,7 +75,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     super.dispose();
   }
 
-  // ── Observer callbacks ─────────────────────────────────────────────────────
+  
   @override
   void onWorkoutStarted(String workoutId, String title) {
     debugPrint('[ActiveWorkout] Started: $title');
@@ -101,7 +101,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   @override
   void onStreakUpdated(int newStreak) {}
 
-  // ── Actions ────────────────────────────────────────────────────────────────
+  
   void _toggleSet(int exIdx, int setIdx) {
     final exercises = [..._session.exercises];
     final sets = [...exercises[exIdx].sets];
@@ -136,7 +136,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     setState(() => _isFinishing = true);
     final minutes = (_stopwatch.elapsed.inSeconds / 60).round();
     try {
-      // Save to Firestore (Builder-built session gets persisted via Adapter pattern)
+      
       final id = await ref.read(firestoreServiceProvider).saveWorkout(_session);
       await ref.read(firestoreServiceProvider).completeWorkout(id, minutes);
       ref.read(workoutEventBusProvider).notifyCompleted(id, minutes);
@@ -374,7 +374,7 @@ class _ExerciseBlock extends StatelessWidget {
             style: const TextStyle(color: Color(0xFF5C5F60), fontSize: 12),
           ),
           const SizedBox(height: 16),
-          // Set rows
+          
           ...exercise.sets.asMap().entries.map((e) {
             final i = e.key;
             final s = e.value;

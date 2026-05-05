@@ -1,6 +1,6 @@
-// lib/screens/social features/social_feed.dart
-// Uses: Observer (WorkoutEventBus), Adapter (FirestoreAdapter.socialPostFromDoc),
-//       Decorator (BadgeDecorator on notification icon)
+
+
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +8,7 @@ import '../../core/services/firestore_service.dart';
 import '../../core/services/notification_service.dart';
 import '../../models/app_models.dart';
 import '../../providers/app_providers.dart';
-// FIX: added missing import so BadgeDecorator resolves correctly
+
 import '../../widgets/common/shared_widgets.dart';
 import 'profile_screen.dart' as social_profile;
 
@@ -52,7 +52,7 @@ class FeedScreen extends ConsumerWidget {
           ],
         ),
         actions: [
-          // Decorator: BadgeDecorator adds notification count badge
+          
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: BadgeDecorator(
@@ -235,7 +235,7 @@ class FeedScreen extends ConsumerWidget {
                       createdAt: DateTime.now(),
                     );
                     await ref.read(firestoreServiceProvider).createPost(post);
-                    // Notify observers via event bus
+                    
                     ref.read(workoutEventBusProvider).notifyStarted('', 'Post shared');
                     if (context.mounted) Navigator.pop(context);
                   }
@@ -260,7 +260,7 @@ class FeedScreen extends ConsumerWidget {
   }
 }
 
-// ── Post card ─────────────────────────────────────────────────────────────────
+
 class _PostCard extends StatefulWidget {
   final SocialPost post;
   final VoidCallback onLike;

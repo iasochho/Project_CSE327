@@ -1,6 +1,6 @@
-// lib/screens/home/exercise_list_screen.dart
-// FACTORY PATTERN: ExerciseFactory.search() builds the filtered list
-// OBSERVER PATTERN: Riverpod filteredExercisesProvider re-builds on filter/search change
+
+
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,7 +14,7 @@ class ExerciseListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Observer: rebuilds automatically when filter or search changes
+    
     final exercises = ref.watch(filteredExercisesProvider);
     final selected  = ref.watch(exerciseMuscleFilterProvider);
 
@@ -29,11 +29,11 @@ class ExerciseListScreen extends ConsumerWidget {
                 style: Theme.of(context).textTheme.headlineLarge),
           ),
 
-          // ── Search ───────────────────────────────────────────────────────
+          
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
-              // Factory pattern: triggers ExerciseFactory.search via provider
+              
               onChanged: (v) =>
                   ref.read(exerciseSearchQueryProvider.notifier).state = v,
               decoration: InputDecoration(
@@ -56,7 +56,7 @@ class ExerciseListScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 14),
 
-          // ── Muscle-group filter chips ─────────────────────────────────────
+          
           SizedBox(
             height: 36,
             child: ListView.separated(
@@ -68,7 +68,7 @@ class ExerciseListScreen extends ConsumerWidget {
                 final label  = exerciseMuscleFilters[i];
                 final active = selected == label;
                 return GestureDetector(
-                  // Observer: updates filter → Factory rebuilds list
+                  
                   onTap: () => ref
                       .read(exerciseMuscleFilterProvider.notifier)
                       .state = label,
@@ -98,7 +98,7 @@ class ExerciseListScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
-          // ── Exercise list ─────────────────────────────────────────────────
+          
           Expanded(
             child: exercises.isEmpty
                 ? Center(
@@ -129,7 +129,7 @@ class ExerciseListScreen extends ConsumerWidget {
   }
 }
 
-// ── Exercise Card ─────────────────────────────────────────────────────────────
+
 class _ExerciseCard extends StatelessWidget {
   final Exercise exercise;
   const _ExerciseCard({required this.exercise});
@@ -167,7 +167,7 @@ class _ExerciseCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image area with category badge
+          
           Stack(
             children: [
               Container(
@@ -210,7 +210,7 @@ class _ExerciseCard extends StatelessWidget {
               ),
             ],
           ),
-          // Info row
+          
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             child: Column(

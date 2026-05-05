@@ -1,7 +1,7 @@
-// lib/screens/progress/progress_screen.dart
-// OBSERVER PATTERN: progressProvider streams live data from Firestore
-// ADAPTER PATTERN:  FirestoreAdapter.progressFromDocs() adapts raw Firestore docs
-//                  into ProgressData (applied upstream in FirestoreService)
+
+
+
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,8 +16,8 @@ class ProgressScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Observer: rebuild whenever Firestore workout data changes.
-    // progressProvider is a StreamProvider<ProgressData> so .when() is valid.
+    
+    
     final progressAsync = ref.watch(progressProvider);
 
     return Scaffold(
@@ -65,18 +65,18 @@ class _ProgressBody extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineLarge),
         const SizedBox(height: 24),
 
-        // ── Strength Line Chart ────────────────────────────────────────────
+        
         _StrengthChart(
           data: progress.strengthData,
           gainPercent: progress.strengthGainPercent,
         ),
         const SizedBox(height: 16),
 
-        // ── Weekly Frequency Bar Chart ─────────────────────────────────────
+        
         _WeeklyFrequencyChart(avgSessions: progress.avgSessionsPerWeek),
         const SizedBox(height: 16),
 
-        // ── Stat Grid ─────────────────────────────────────────────────────
+        
         Row(
           children: [
             Expanded(
@@ -115,7 +115,7 @@ class _ProgressBody extends StatelessWidget {
         ),
         const SizedBox(height: 24),
 
-        // ── Recent Milestones ──────────────────────────────────────────────
+        
         if (progress.recentMilestones.isNotEmpty) ...[
           Text('Recent Milestones',
               style: Theme.of(context).textTheme.headlineMedium),
@@ -128,7 +128,7 @@ class _ProgressBody extends StatelessWidget {
   }
 }
 
-// ── Strength Line Chart ───────────────────────────────────────────────────────
+
 class _StrengthChart extends StatelessWidget {
   final List<double> data;
   final double gainPercent;
@@ -234,7 +234,7 @@ class _StrengthChart extends StatelessWidget {
   }
 }
 
-// ── Weekly Frequency Bar Chart ────────────────────────────────────────────────
+
 class _WeeklyFrequencyChart extends StatelessWidget {
   final double avgSessions;
   const _WeeklyFrequencyChart({required this.avgSessions});
@@ -305,7 +305,7 @@ class _WeeklyFrequencyChart extends StatelessWidget {
   }
 }
 
-// ── Streak Stat Tile ──────────────────────────────────────────────────────────
+
 class _StreakStatTile extends StatelessWidget {
   final int days;
   const _StreakStatTile({required this.days});
@@ -336,9 +336,9 @@ class _StreakStatTile extends StatelessWidget {
   }
 }
 
-// ── Milestone Tile ─────────────────────────────────────────────────────────────
-// FIX: milestone.icon and milestone.date are nullable (String?) — added null
-//      fallback operators so the screen compiles under null-safety.
+
+
+
 class _MilestoneTile extends StatelessWidget {
   final Milestone milestone;
   const _MilestoneTile({required this.milestone});
@@ -365,7 +365,7 @@ class _MilestoneTile extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: Center(
-              // FIX: milestone.icon is String? — use ?? fallback
+              
               child: Text(milestone.icon ?? '⭐',
                   style: const TextStyle(fontSize: 22)),
             ),
@@ -380,7 +380,7 @@ class _MilestoneTile extends StatelessWidget {
               ],
             ),
           ),
-          // FIX: milestone.date is String? — use ?? fallback before .toUpperCase()
+          
           Text(
             (milestone.date ?? '').toUpperCase(),
             style: Theme.of(context)

@@ -1,6 +1,6 @@
-// lib/screens/settings/settings_screen.dart
-// OBSERVER PATTERN: watches toggle state providers
-// STRATEGY PATTERN: signOut delegates to AuthService which uses the right AuthStrategy
+
+
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,10 +9,10 @@ import '../../providers/app_providers.dart';
 import '../../widgets/common/shared_widgets.dart';
 import '../auth/login_screen.dart';
 
-// FIX: Removed duplicate local provider declarations for notificationsEnabledProvider,
-// darkModeEnabledProvider, and metricUnitsProvider — they are now defined in
-// app_providers.dart. Declaring them here caused "already defined" errors and made
-// authServiceProvider unreachable.
+
+
+
+
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -34,7 +34,7 @@ class SettingsScreen extends ConsumerWidget {
               style: Theme.of(context).textTheme.bodyMedium),
           const SizedBox(height: 28),
 
-          // ── Preferences ─────────────────────────────────────────────────────
+          
           _SectionLabel('PREFERENCES'),
           const SizedBox(height: 10),
           _SettingsGroup(
@@ -72,7 +72,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // ── Account & Security ───────────────────────────────────────────────
+          
           _SectionLabel('ACCOUNT & SECURITY'),
           const SizedBox(height: 10),
           _SettingsGroup(
@@ -119,8 +119,8 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 28),
 
-          // ── Log Out ──────────────────────────────────────────────────────────
-          // Strategy pattern: AuthService.signOut picks the correct sign-out strategy
+          
+          
           GestureDetector(
             onTap: () async {
               await ref.read(authServiceProvider).signOut();
@@ -160,7 +160,7 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-// ── Sub-widgets ───────────────────────────────────────────────────────────────
+
 class _SectionLabel extends StatelessWidget {
   final String text;
   const _SectionLabel(this.text);

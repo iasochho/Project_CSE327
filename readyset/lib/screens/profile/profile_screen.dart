@@ -1,4 +1,4 @@
-// lib/screens/profile/profile_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -20,7 +20,7 @@ class ProfileScreen extends ConsumerWidget {
       backgroundColor: AppColors.surfaceVariant,
       body: ListView(
         children: [
-          // ── Header ────────────────────────────────────────────────────────
+          
           Container(
             color: AppColors.surfaceVariant,
             padding: const EdgeInsets.symmetric(vertical: 32),
@@ -80,7 +80,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
 
-          // ── Fitness Summary ───────────────────────────────────────────────
+          
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
@@ -95,7 +95,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
 
-                // Workouts + Streak Row
+                
                 Row(
                   children: [
                     Expanded(
@@ -151,7 +151,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
 
-                // Level card
+                
                 KZCard(
                   child: Row(
                     children: [
@@ -194,7 +194,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // ── Settings ─────────────────────────────────────────────────
+                
                 _SettingsTile(
                   icon: Icons.settings_outlined,
                   label: 'Account Settings',
@@ -211,7 +211,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
 
-                // ── Logout ────────────────────────────────────────────────────
+                
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).pushAndRemoveUntil(

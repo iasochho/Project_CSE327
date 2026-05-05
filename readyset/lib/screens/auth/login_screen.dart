@@ -1,4 +1,4 @@
-// lib/screens/auth/login_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
@@ -41,7 +41,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             children: [
               const SizedBox(height: 80),
 
-              // ── Logo ───────────────────────────────────────────────────────
+              
               Container(
                 width: 72,
                 height: 72,
@@ -70,7 +70,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 64),
 
-              // ── Email ──────────────────────────────────────────────────────
+              
               _FieldLabel('EMAIL ADDRESS'),
               const SizedBox(height: 8),
               _InputField(
@@ -80,7 +80,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 20),
 
-              // ── Password ───────────────────────────────────────────────────
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -116,7 +116,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 36),
 
-              // ── Sign In Button ─────────────────────────────────────────────
+              
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -141,7 +141,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 28),
 
-              // ── Divider ────────────────────────────────────────────────────
+              
               Row(
                 children: [
                   const Expanded(child: Divider(color: Color(0xFFDDE1E7))),
@@ -155,7 +155,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 24),
 
-              // ── Social Buttons ─────────────────────────────────────────────
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -174,7 +174,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 48),
 
-              // ── Create Account ─────────────────────────────────────────────
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

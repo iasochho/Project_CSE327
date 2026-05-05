@@ -1,15 +1,40 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/app_models.dart';
 import '../../providers/app_providers.dart';
 import 'exercise_selection_screen.dart';
-import 'active_workout_screen.dart';
 
-class TemplateBuilderScreen extends ConsumerWidget {
+class TemplateBuilderScreen extends ConsumerStatefulWidget {
   const TemplateBuilderScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TemplateBuilderScreen> createState() => _TemplateBuilderScreenState();
+}
+
+class _TemplateBuilderScreenState extends ConsumerState<TemplateBuilderScreen> {
+  late TextEditingController _nameController;
+  late TextEditingController _descriptionController;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _descriptionController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final template = ref.watch(templateBuilderProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       extendBody: true,
@@ -21,15 +46,15 @@ class TemplateBuilderScreen extends ConsumerWidget {
           children: [
             _buildHeroTitle(),
             const SizedBox(height: 32),
-            _buildWorkoutIdentityCard(),
+            _buildWorkoutIdentityCard(template),
             const SizedBox(height: 32),
-            _buildEmptyCanvas(context),
+            _buildExercisesCanvas(context, template),
             const SizedBox(height: 48),
             _buildFoundationSection(context),
           ],
         ),
       ),
-      bottomNavigationBar: _buildContextualActionBar(),
+      bottomNavigationBar: _buildContextualActionBar(context, template),
     );
   }
 
@@ -43,11 +68,10 @@ class TemplateBuilderScreen extends ConsumerWidget {
         onPressed: () => Navigator.pop(context),
       ),
       title: const Text(
-        'KINETIC ZEN',
+        'TEMPLATE BUILDER',
         style: TextStyle(
           color: Color(0xFF005DA7),
           fontWeight: FontWeight.bold,
-          fontStyle: FontStyle.italic,
           fontSize: 18,
           letterSpacing: -1,
         ),
@@ -60,7 +84,7 @@ class TemplateBuilderScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: const [
         Text(
-          'CREATIVE BUILDER',
+          'CREATE ROUTINE',
           style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.bold,
@@ -70,7 +94,7 @@ class TemplateBuilderScreen extends ConsumerWidget {
         ),
         SizedBox(height: 8),
         Text(
-          'Define your momentum.',
+          'Build your custom workout.',
           style: TextStyle(
             fontSize: 40,
             fontWeight: FontWeight.bold,
@@ -82,7 +106,7 @@ class TemplateBuilderScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildWorkoutIdentityCard() {
+  Widget _buildWorkoutIdentityCard(WorkoutTemplate template) {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
@@ -101,6 +125,8 @@ class TemplateBuilderScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           TextField(
+            controller: _nameController,
+            onChanged: (value) => ref.read(templateBuilderProvider.notifier).setName(value),
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             decoration: InputDecoration(
               hintText: 'e.g., Upper Body Blast',
@@ -111,16 +137,43 @@ class TemplateBuilderScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
+          const Text(
+            'DESCRIPTION',
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Color(0xFF414751)),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _descriptionController,
+            onChanged: (value) => ref.read(templateBuilderProvider.notifier).setDescription(value),
+            maxLines: 3,
+            style: const TextStyle(fontSize: 14),
+            decoration: InputDecoration(
+              hintText: 'Add notes about this routine...',
+              filled: true,
+              fillColor: const Color(0xFFE2E2E2),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            ),
+          ),
+          const SizedBox(height: 24),
           Row(
             children: [
-              _buildMiniStat('Estimated Duration', '-- mins'),
+              _buildMiniStat('Exercises', template.exercises.length.toString()),
               const SizedBox(width: 16),
-              _buildMiniStat('Target Focus', 'All', highlight: true),
+              _buildMiniStat('Duration', '${_calculateDuration(template)} mins'),
             ],
           ),
         ],
       ),
     );
+  }
+
+  int _calculateDuration(WorkoutTemplate template) {
+    int total = 0;
+    for (var exercise in template.exercises) {
+      total += (exercise.sets.length * 3) + 2;
+    }
+    return total;
   }
 
   Widget _buildMiniStat(String label, String value, {bool highlight = false}) {
@@ -140,6 +193,12 @@ class TemplateBuilderScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildExercisesCanvas(BuildContext context, WorkoutTemplate template) {
+    return template.exercises.isEmpty
+        ? _buildEmptyCanvas(context)
+        : _buildExercisesList(context, template);
+  }
+
   Widget _buildEmptyCanvas(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -147,12 +206,13 @@ class TemplateBuilderScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF3F3F3),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFC1C7D3).withOpacity(0.3), width: 2), 
+        border: Border.all(color: const Color(0xFFC1C7D3).withOpacity(0.3), width: 2),
       ),
       child: Column(
         children: [
           Container(
-            height: 80, width: 80,
+            height: 80,
+            width: 80,
             decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
             child: const Icon(Icons.fitness_center, color: Color(0xFF005DA7), size: 32),
           ),
@@ -166,12 +226,83 @@ class TemplateBuilderScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 32),
           _buildPrimaryButton(
-            'Add First Exercise', 
-            Icons.add, 
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ExerciseSelectionScreen()))
+            'Add First Exercise',
+            Icons.add,
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ExerciseSelectionScreen()),
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildExercisesList(BuildContext context, WorkoutTemplate template) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Exercises', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 16),
+        ...template.exercises.asMap().entries.map((e) {
+          final idx = e.key;
+          final exercise = e.value;
+          return Dismissible(
+            key: Key('$idx-${exercise.exerciseId}'),
+            onDismissed: (_) => ref.read(templateBuilderProvider.notifier).removeExercise(idx),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8)],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(exercise.exerciseName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            Text('${exercise.muscleGroup} • ${exercise.sets.length} sets', style: const TextStyle(fontSize: 13, color: Color(0xFF5C5F60))),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Color(0xFFBA1A1A), size: 20),
+                        onPressed: () => ref.read(templateBuilderProvider.notifier).removeExercise(idx),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: exercise.sets.map((set) => Chip(
+                      label: Text('${set.reps}x${set.weight.toStringAsFixed(0)}kg'),
+                      backgroundColor: const Color(0xFFF3F3F3),
+                      side: const BorderSide(color: Color(0xFFE0E0E0)),
+                    )).toList(),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+        const SizedBox(height: 16),
+        _buildPrimaryButton(
+          'Add Exercise',
+          Icons.add,
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ExerciseSelectionScreen()),
+          ),
+        ),
+      ],
     );
   }
 
@@ -204,13 +335,13 @@ class TemplateBuilderScreen extends ConsumerWidget {
 
   Widget _buildBentoCard(BuildContext context, String title, String sub, IconData icon, Color color) {
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ActiveWorkoutScreen())),
+      onTap: () {},
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white, 
-          borderRadius: BorderRadius.circular(16), 
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20)]
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20)],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,7 +358,7 @@ class TemplateBuilderScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContextualActionBar() {
+  Widget _buildContextualActionBar(BuildContext context, WorkoutTemplate template) {
     return Container(
       margin: const EdgeInsets.all(24),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -243,26 +374,66 @@ class TemplateBuilderScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('TEMPLATE STATUS', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Color(0xFF5C5F60))),
+              const Text('STATUS', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Color(0xFF5C5F60))),
               Row(
                 children: [
-                  Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFFBA1A1A), shape: BoxShape.circle)),
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: template.isDraft ? const Color(0xFFBA1A1A) : const Color(0xFF4CAF50),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
                   const SizedBox(width: 8),
-                  const Text('Draft Mode', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(
+                    template.isDraft ? 'Draft' : 'Saved',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                 ],
               ),
             ],
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: _isSaving
+                ? null
+                : () async {
+                    if (_nameController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please enter a template name')),
+                      );
+                      return;
+                    }
+                    setState(() => _isSaving = true);
+                    try {
+                      final user = ref.read(userProvider);
+                      await ref.read(templateBuilderProvider.notifier).saveTemplate(user.uid);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Template saved successfully!')),
+                        );
+                        Navigator.pop(context);
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: $e')),
+                        );
+                      }
+                    } finally {
+                      if (mounted) setState(() => _isSaving = false);
+                    }
+                  },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE2E2E2),
-              foregroundColor: const Color(0xFF414751),
+              backgroundColor: const Color(0xFF005DA7),
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               elevation: 0,
             ),
-            child: const Text('SAVE DRAFT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            child: _isSaving
+                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(Colors.white)))
+                : const Text('SAVE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
           ),
         ],
       ),

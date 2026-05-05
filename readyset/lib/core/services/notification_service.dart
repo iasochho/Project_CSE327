@@ -1,7 +1,7 @@
-// lib/core/services/notification_service.dart
-// OBSERVER PATTERN: WorkoutEventBus notifies registered WorkoutEventObserver listeners
 
-/// Observer interface – implement this to receive workout lifecycle events.
+
+
+
 abstract class WorkoutEventObserver {
   void onWorkoutStarted(String workoutId, String title);
   void onWorkoutCompleted(String workoutId, int durationMinutes);
@@ -9,7 +9,7 @@ abstract class WorkoutEventObserver {
   void onStreakUpdated(int newStreak);
 }
 
-/// Subject (Event Bus) – broadcasts workout events to all subscribed observers.
+
 class WorkoutEventBus {
   WorkoutEventBus._();
   static final WorkoutEventBus instance = WorkoutEventBus._();

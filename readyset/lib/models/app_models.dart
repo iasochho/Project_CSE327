@@ -1,10 +1,10 @@
-// lib/models/app_models.dart
-// Unified model file: UserProfile, WorkoutSession, WorkoutExercise,
-// ExerciseSet, ProgressData, Milestone, SocialPost
-// Also re-exports the legacy UserModel / StatsModel / ProgressModel for
-// any screens that still reference them.
 
-// ── UserProfile (used by FirestoreService, active_workout_screen, etc.) ────────
+
+
+
+
+
+
 class UserProfile {
   final String uid;
   final String name;
@@ -49,7 +49,7 @@ class UserProfile {
   }
 }
 
-// ── ExerciseSet ────────────────────────────────────────────────────────────────
+
 class ExerciseSet {
   final int reps;
   final double weight;
@@ -70,24 +70,20 @@ class ExerciseSet {
   }
 }
 
-// ── WorkoutExercise ────────────────────────────────────────────────────────────
-// FIX: Added optional 'name' and 'muscle' parameters as aliases for
-// 'exerciseName' and 'muscleGroup' so both calling conventions work:
-//   WorkoutExercise(exerciseId: ..., exerciseName: ..., sets: ...)  ← firestore / home
-//   WorkoutExercise(exerciseId: ..., name: ..., muscle: ..., sets: ...)  ← active_workout
+
 class WorkoutExercise {
   final String exerciseId;
-  final String exerciseName;  // canonical field used by Firestore adapter
-  final String muscleGroup;   // canonical field
+  final String exerciseName;  
+  final String muscleGroup;   
   final String? imageUrl;
   final List<ExerciseSet> sets;
 
   WorkoutExercise({
     required this.exerciseId,
-    // Accept either 'exerciseName' or 'name'; one must be provided.
+    
     String? exerciseName,
     String? name,
-    // Accept either 'muscleGroup' or 'muscle'
+    
     String? muscleGroup,
     String? muscle,
     this.imageUrl,
@@ -95,12 +91,12 @@ class WorkoutExercise {
   })  : exerciseName = exerciseName ?? name ?? '',
         muscleGroup  = muscleGroup  ?? muscle ?? '';
 
-  // Convenience getter so code that reads `.name` still works.
+  
   String get name => exerciseName;
   String get muscle => muscleGroup;
 }
 
-// ── WorkoutSession ─────────────────────────────────────────────────────────────
+
 class WorkoutSession {
   final String id;
   final String title;
@@ -121,18 +117,18 @@ class WorkoutSession {
   });
 }
 
-// ── Milestone ─────────────────────────────────────────────────────────────────
-// Supports both the old-style (description/timeAgo/type) fields used by
-// app_providers.dart AND the new-style (date/icon) fields used by
-// progress_screen.dart and firestore_service.dart.
+
+
+
+
 class Milestone {
   final String title;
 
-  // New-style fields (progress_screen / firestore_service)
+  
   final String? date;
   final String? icon;
 
-  // Old-style fields (app_providers mock data)
+  
   final String? description;
   final String? timeAgo;
   final MilestoneType? type;
@@ -149,8 +145,8 @@ class Milestone {
 
 enum MilestoneType { pr, consistency, streak, calorie }
 
-// ── ProgressData ───────────────────────────────────────────────────────────────
-// Used by FirestoreService.progressFromDocs() and progress_screen.dart
+
+
 class ProgressData {
   final List<double> strengthData;
   final double strengthGainPercent;
@@ -173,7 +169,7 @@ class ProgressData {
   });
 }
 
-// ── SocialPost ─────────────────────────────────────────────────────────────────
+
 class SocialPost {
   final String id;
   final String userId;
@@ -198,7 +194,7 @@ class SocialPost {
   });
 }
 
-// ── Legacy models (kept for backward-compat with app_providers.dart) ──────────
+
 class UserModel {
   final String name;
   final String email;
@@ -259,4 +255,58 @@ class ProgressModel {
     required this.weightKg,
     required this.recentMilestones,
   });
+}
+
+
+
+class WorkoutTemplate {
+  final String id;
+  final String userId;
+  final String name;
+  final String description;
+  final List<WorkoutExercise> exercises;
+  final int estimatedDurationMinutes;
+  final String targetFocus;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final bool isDraft;
+
+  const WorkoutTemplate({
+    required this.id,
+    required this.userId,
+    required this.name,
+    this.description = '',
+    required this.exercises,
+    this.estimatedDurationMinutes = 0,
+    this.targetFocus = 'All',
+    required this.createdAt,
+    this.updatedAt,
+    this.isDraft = true,
+  });
+
+  WorkoutTemplate copyWith({
+    String? id,
+    String? userId,
+    String? name,
+    String? description,
+    List<WorkoutExercise>? exercises,
+    int? estimatedDurationMinutes,
+    String? targetFocus,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? isDraft,
+  }) {
+    return WorkoutTemplate(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      exercises: exercises ?? this.exercises,
+      estimatedDurationMinutes: estimatedDurationMinutes ?? this.estimatedDurationMinutes,
+      targetFocus: targetFocus ?? this.targetFocus,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isDraft: isDraft ?? this.isDraft,
+    );
+  }
 }
